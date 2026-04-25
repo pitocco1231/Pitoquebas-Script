@@ -1,15 +1,24 @@
--- 🔐 SISTEMA DE KEY (API)
+-- 🔐 SISTEMA DE KEY (API) + FIXES
+
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
+print("Script iniciou")
+
 local API = "https://pitoquebas-script-1.onrender.com/check"
 
-local function CheckKey(key)
-    local request = (syn and syn.request)
+-- request universal
+local function getRequest()
+    return (syn and syn.request)
         or (http and http.request)
         or http_request
+        or (fluxus and fluxus.request)
         or request
+end
+
+local function CheckKey(key)
+    local request = getRequest()
 
     if not request then
         warn("Executor não suporta request")
@@ -28,13 +37,24 @@ local function CheckKey(key)
     if success and res and res.StatusCode == 200 then
         local data = HttpService:JSONDecode(res.Body)
         return data.valid
+    else
+        warn("Erro ao verificar key")
     end
 
     return false
 end
 
--- GUI LOGIN
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+-- 🖥️ GUI (FUNCIONA EM TODOS)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PitoLogin"
+
+pcall(function()
+    ScreenGui.Parent = game:GetService("CoreGui")
+end)
+
+if not ScreenGui.Parent then
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
 
 local Frame = Instance.new("Frame", ScreenGui)
 Frame.Size = UDim2.new(0, 300, 0, 160)
@@ -55,9 +75,17 @@ Btn.Text = "VERIFICAR"
 local Liberado = false
 
 Btn.MouseButton1Click:Connect(function()
+    print("Botão clicado")
+
     Btn.Text = "Verificando..."
 
-    if CheckKey(TextBox.Text) then
+    local ok = false
+
+    local success = pcall(function()
+        ok = CheckKey(TextBox.Text)
+    end)
+
+    if success and ok then
         Btn.Text = "Sucesso!"
         Liberado = true
         task.wait(1)
@@ -72,8 +100,9 @@ end)
 -- trava até logar
 repeat task.wait() until Liberado
 
+print("Login passou")
 
--- 🔥 SCRIPT PRINCIPAL (SEM DISCORD / SEM LOGIN ANTIGO)
+-- 🔥 SCRIPT PRINCIPAL
 
 -- Anti-Kick
 local mt = getrawmetatable(game)

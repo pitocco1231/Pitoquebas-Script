@@ -1,0 +1,153 @@
+-- [[ PITOQUEBAS SCRIPTS - V4 ]] --
+
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Configurações de Webhook e Discord
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1497438217677574340/GJhmRX7r_BX2QsuTMaNu-ScArQ6lnoxnFHBqTgfBRTKqRkeGinr4b5oCiWL1U_hzPgck"
+local DISCORD_ID = "671847842662318080"
+local DISCORD_INVITE = "https://discord.gg/32m6ekBB8"
+
+-- Log de Acesso (Seguro)
+task.spawn(function()
+    pcall(function()
+        local request = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+        if request then
+            local platform = (UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled) and "Mobile" or "PC"
+            request({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = HttpService:JSONEncode({
+                    ["content"] = "<@" .. DISCORD_ID .. "> 🚨 Novo acesso detectado!",
+                    ["embeds"] = {{
+                        ["title"] = "Pitoquebas Scripts - Log",
+                        ["description"] = "Um usuário executou o script.",
+                        ["color"] = 0x5865F2, -- Blurple Discord
+                        ["fields"] = {
+                            {["name"] = "Nome", ["value"] = LocalPlayer.Name, ["inline"] = true},
+                            {["name"] = "Display", ["value"] = LocalPlayer.DisplayName, ["inline"] = true},
+                            {["name"] = "Plataforma", ["value"] = platform, ["inline"] = true},
+                            {["name"] = "User ID", ["value"] = tostring(LocalPlayer.UserId), ["inline"] = false}
+                        },
+                        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+                    }}
+                })
+            })
+        end
+    end)
+end)
+
+-- Anti-Kick (Metatable Bypass)
+local mt = getrawmetatable(game)
+local oldNamecall = mt.__namecall
+setreadonly(mt, false)
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method == "Kick" or method == "kick" then return nil end
+    return oldNamecall(self, ...)
+end)
+setreadonly(mt, true)
+
+-- Carregar Rayfield UI
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Pitoquebas Scripts | V4",
+    LoadingTitle = "Iniciando Sistema...",
+    LoadingSubtitle = "por Pitoquebas",
+    ConfigurationSaving = {Enabled = false},
+    KeySystem = false,
+    Theme = "Default" -- Você pode mudar para "Amber", "Amethyst", "Ocean", etc.
+})
+
+-- Variáveis de Controle
+local Settings = {
+    AutoToken = false,
+    AutoAbility = false,
+    AutoYen = false
+}
+
+-- Serviço de Recompensa (SeasonService)
+local RewardRemote;
+pcall(function()
+    RewardRemote = game:GetService("ReplicatedStorage").Packages._Index["sleitnick_knit@1.7.0"].knit.Services.SeasonService.RF.RequestRankedReward
+end)
+
+-- Loop de Farm
+task.spawn(function()
+    while true do
+        if RewardRemote then
+            if Settings.AutoToken then 
+                pcall(function() RewardRemote:InvokeServer(1) end) 
+                task.wait(math.random(3, 4)) 
+            end
+            if Settings.AutoAbility then 
+                pcall(function() RewardRemote:InvokeServer(4) end) 
+                task.wait(math.random(3, 4)) 
+            end
+            if Settings.AutoYen then 
+                pcall(function() RewardRemote:InvokeServer(2) end) 
+                task.wait(math.random(3, 4)) 
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+
+--- [ TABS ] ---
+
+local MainTab = Window:CreateTab("Auto Farm", 4483362458)
+
+MainTab:CreateSection("Recolhimento Automático")
+
+MainTab:CreateToggle({
+    Name = "Auto Token 🔄",
+    CurrentValue = false,
+    Callback = function(Value) Settings.AutoToken = Value end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto Ability ✨",
+    CurrentValue = false,
+    Callback = function(Value) Settings.AutoAbility = Value end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto Yen 💰",
+    CurrentValue = false,
+    Callback = function(Value) Settings.AutoYen = Value end
+})
+
+MainTab:CreateSection("Configurações da UI")
+
+MainTab:CreateButton({
+    Name = "Destruir Interface",
+    Callback = function() Rayfield:Destroy() end
+})
+
+local SocialTab = Window:CreateTab("Comunidade", 4483362458)
+
+SocialTab:CreateSection("Suporte & Atualizações")
+
+SocialTab:CreateButton({
+    Name = "Copiar Convite Discord",
+    Callback = function()
+        setclipboard(DISCORD_INVITE)
+        Rayfield:Notify({
+            Title = "Sucesso!",
+            Content = "Convite copiado para a área de transferência.",
+            Duration = 5,
+            Image = 4483362458,
+        })
+    end
+})
+
+Rayfield:Notify({
+    Title = "Pitoquebas Scripts",
+    Content = "Script carregado com sucesso!",
+    Duration = 5,
+    Image = 4483362458,
+})

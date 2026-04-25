@@ -1,3 +1,78 @@
+-- 🔐 SISTEMA DE KEY (API)
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local API = "https://pitoquebas-script-1.onrender.com/check"
+
+local function CheckKey(key)
+    local request = (syn and syn.request)
+        or (http and http.request)
+        or http_request
+        or request
+
+    if not request then
+        warn("Executor não suporta request")
+        return false
+    end
+
+    local url = API .. "?key=" .. key .. "&user=" .. LocalPlayer.UserId
+
+    local success, res = pcall(function()
+        return request({
+            Url = url,
+            Method = "GET"
+        })
+    end)
+
+    if success and res and res.StatusCode == 200 then
+        local data = HttpService:JSONDecode(res.Body)
+        return data.valid
+    end
+
+    return false
+end
+
+-- GUI LOGIN
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 300, 0, 160)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -80)
+Frame.BackgroundColor3 = Color3.fromRGB(35,35,35)
+
+local TextBox = Instance.new("TextBox", Frame)
+TextBox.Size = UDim2.new(0, 240, 0, 35)
+TextBox.Position = UDim2.new(0.5, -120, 0.4, 0)
+TextBox.PlaceholderText = "Insira sua Key..."
+TextBox.Text = ""
+
+local Btn = Instance.new("TextButton", Frame)
+Btn.Size = UDim2.new(0, 150, 0, 35)
+Btn.Position = UDim2.new(0.5, -75, 0.75, 0)
+Btn.Text = "VERIFICAR"
+
+local Liberado = false
+
+Btn.MouseButton1Click:Connect(function()
+    Btn.Text = "Verificando..."
+
+    if CheckKey(TextBox.Text) then
+        Btn.Text = "Sucesso!"
+        Liberado = true
+        task.wait(1)
+        ScreenGui:Destroy()
+    else
+        Btn.Text = "Key inválida!"
+        task.wait(1.5)
+        Btn.Text = "VERIFICAR"
+    end
+end)
+
+-- trava o script até logar
+repeat task.wait() until Liberado
+
+esse ja e todo o script junto?
 -- [[ PITOQUEBAS SCRIPTS - V4 ]] --
 
 local HttpService = game:GetService("HttpService")

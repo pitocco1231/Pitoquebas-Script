@@ -5,11 +5,60 @@ local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Configurações de Webhook e Discord
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1497438217677574340/GJhmRX7r_BX2QsuTMaNu-ScArQ6lnoxnFHBqTgfBRTKqRkeGinr4b5oCiWL1U_hzPgck"
-local DISCORD_ID = "671847842662318080"
-local DISCORD_INVITE = "https://discord.gg/32m6ekBB8"
+-- Configuração das Senhas
+local senhas_validas = {
+    "AHWDAFMWA", "WDAGNWASDN", "WDCNASNGOW", "WADSBMZNXCU", "WDANBNZAPZ",
+    "CWDASBALSD", "LASKVJASOWJ", "WDASIVIASJNV", "PASUVASIWSDW", "SDZOWUWNFW"
+}
 
+-- Função para verificar se a senha está na lista
+local function verificar_senha(entrada)
+    for _, senha in pairs(senhas_validas) do
+        if entrada == senha then
+            return true
+        end
+    end
+    return false
+end
+
+-- Interface Simples de Autenticação (Exemplo para Roblox/Lua)
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextBox = Instance.new("TextBox")
+local TextButton = Instance.new("TextButton")
+
+ScreenGui.Parent = game.CoreGui
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 300, 0, 150)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+TextBox.Parent = Frame
+TextBox.Size = UDim2.new(0, 200, 0, 30)
+TextBox.Position = UDim2.new(0.5, -100, 0.3, 0)
+TextBox.PlaceholderText = "Digite a Senha..."
+
+TextButton.Parent = Frame
+TextButton.Size = UDim2.new(0, 100, 0, 30)
+TextButton.Position = UDim2.new(0.5, -50, 0.6, 0)
+TextButton.Text = "Entrar"
+
+-- Lógica do Botão
+TextButton.MouseButton1Click:Connect(function()
+    if verificar_senha(TextBox.Text) then
+        print("Acesso Permitido!")
+        ScreenGui:Destroy() -- Fecha a janela
+        
+        -- AQUI VOCÊ COLOCA O SEU SCRIPT PRINCIPAL --
+        print("Carregando Pitoquebas Script...")
+        
+    else
+        TextBox.Text = ""
+        TextBox.PlaceholderText = "SENHA ERRADA!"
+        wait(1)
+        TextBox.PlaceholderText = "Tente novamente..."
+    end
+end)
 -- Log de Acesso (Seguro)
 task.spawn(function()
     pcall(function()
